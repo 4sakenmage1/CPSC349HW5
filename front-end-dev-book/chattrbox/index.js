@@ -2,15 +2,13 @@ var http = require("http");
 var fs = require("fs");
 var extract = require("./extract");
 var wss = require("./websockets-server");
-
-
 var mime = require("mime");
 
 var handleError = function(err, res) {
-  res.writeHead(404, {
-    "Content-Type": "text/html"
+  res.writeHead(404);
+  fs.readFile("app/error.html", function(err, data) {
+    res.end(data);
   });
-  res.end("<meta http-equiv=\"Refresh\" content=\"0; url=/error.html\" />");
 };
 
 var server = http.createServer(function(req, res) {
@@ -21,11 +19,9 @@ var server = http.createServer(function(req, res) {
       handleError(err, res);
       return;
     } else {
+      res.setHeader("Content-Type", mime.getType(req.url));
       res.end(data);
     }
   });
-
-  var getMime = mime.getType(filePath)
-  //console.log("MIME Type is: " + getMime);
 });
 server.listen(3000);
